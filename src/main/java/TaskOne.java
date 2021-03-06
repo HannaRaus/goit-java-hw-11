@@ -5,7 +5,7 @@
 Предусмотрите возможность ежесекундного оповещения потока, воспроизводящего сообщение, потоком, отсчитывающим время.
  */
 public class TaskOne {
-    private static Clock clock = new Clock(5);
+    private static Clock clock = new Clock(30);
 
     public static void main(String[] args) {
 
