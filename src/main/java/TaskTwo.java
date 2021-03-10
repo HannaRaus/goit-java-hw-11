@@ -1,4 +1,4 @@
-import java.util.StringJoiner;
+import java.util.*;
 
 /*
 Напишите программу, которая выводит в консоль строку, состоящую из чисел от 1 до n, но с заменой некоторых значений:
@@ -17,25 +17,24 @@ import java.util.StringJoiner;
 Поток D вызывает number() чтобы вывести число.
  */
 public class TaskTwo {
-    private static FizzBuzz fizzBuzz = new FizzBuzz(15);
-
     public static void main(String[] args) {
-        fizzBuzz.run();
+        FizzBuzz fizzBuzz = new FizzBuzz(15);
+        fizzBuzz.play();
     }
 }
 
 class FizzBuzz {
     private final int end;
-    private volatile int number;
-    private StringJoiner result;
+    private volatile int currentNumber;
+    private volatile StringJoiner result = new StringJoiner(", ", "", ".");
 
     public FizzBuzz(int end) {
         this.end = end;
-        this.number = 1;
-        result = new StringJoiner(", ");
+        this.currentNumber = 1;
     }
 
-    public void run() {
+    public void play() {
+
         new Thread(() -> number(), "Just numbers").start();
 
         new Thread(() -> fizz(), "Fizz numbers").start();
@@ -44,47 +43,38 @@ class FizzBuzz {
 
         new Thread(() -> fizzbuzz(), "FizzBuzz numbers").start();
 
+        System.out.println("Result - " + result);
     }
 
-
-    private synchronized void number() {
-        while (number <= end) {
-            System.out.print(number + ", ");
-            result.add(String.valueOf(number));
-            number++;
-            notifyAll();
-            if (number % 3 == 0 || number % 5 == 0) {
+    public synchronized void number() {
+        while (currentNumber <= end) {
+            addNumberToResult(String.valueOf(currentNumber));
+            if (currentNumber % 3 == 0 || currentNumber % 5 == 0) {
                 isWaiting();
             }
         }
     }
 
-    private synchronized void fizz() {
-        while (number <= end) {
-            if (number % 3 == 0 && number % 5 != 0) {
-                System.out.print("fizz, ");
-                number++;
-                notifyAll();
+    public synchronized void fizz() {
+        while (currentNumber <= end) {
+            if (currentNumber % 3 == 0 && currentNumber % 5 != 0) {
+                addNumberToResult("fizz");
             } else isWaiting();
         }
     }
 
-    private synchronized void buzz() {
-        while (number <= end) {
-            if (number % 5 == 0 && number % 3 != 0) {
-                System.out.print("buzz, ");
-                number++;
-                notifyAll();
+    public synchronized void buzz() {
+        while (currentNumber <= end) {
+            if (currentNumber % 5 == 0 && currentNumber % 3 != 0) {
+                addNumberToResult("buzz");
             } else isWaiting();
         }
     }
 
-    private synchronized void fizzbuzz() {
-        while (number <= end) {
-            if (number % 15 == 0) {
-                System.out.print("fizzbuzz, ");
-                number++;
-                notifyAll();
+    public synchronized void fizzbuzz() {
+        while (currentNumber <= end) {
+            if (currentNumber % 15 == 0) {
+                addNumberToResult("fizzbuzz");
             } else isWaiting();
         }
     }
@@ -96,6 +86,13 @@ class FizzBuzz {
             e.printStackTrace();
         }
     }
+
+    private synchronized void addNumberToResult(String numberIs) {
+            result.add(String.valueOf(numberIs));
+            currentNumber++;
+            notifyAll();
+    }
+
 }
 
 
