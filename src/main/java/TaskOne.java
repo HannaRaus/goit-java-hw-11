@@ -5,7 +5,7 @@
 Предусмотрите возможность ежесекундного оповещения потока, воспроизводящего сообщение, потоком, отсчитывающим время.
  */
 public class TaskOne {
-    private static Clock clock = new Clock(30);
+    private static Clock clock = new Clock(12);
 
     public static void main(String[] args) {
 
@@ -46,6 +46,8 @@ class Clock {
             notifyAll();
             while (start % 5 == 0) {
                 if (end <= 0) { break; }
+                Thread.sleep(1000);
+                System.out.println(start + " sec");
                 wait();
             }
         }
@@ -58,7 +60,6 @@ class Clock {
                 if (end <= 0) { return; }
                 wait();
             }
-            Thread.sleep(1000);
             System.out.println("Пройшло 5 секунд");
             start++;
             end--;
